@@ -43,6 +43,14 @@ describe('BuildingDefinition', () => {
     expect(Object.keys(entrepot!.outputs)).toHaveLength(0)
   })
 
+  it('mine produces Bois and Charbon with no inputs', () => {
+    const mine = buildings.find(b => b.type === 'mine')
+    expect(mine).toBeDefined()
+    expect(Object.keys(mine!.inputs)).toHaveLength(0)
+    expect(mine!.outputs['Bois']).toBeGreaterThan(0)
+    expect(mine!.outputs['Charbon']).toBeGreaterThan(0)
+  })
+
   it('AC#2 — compile-time check: workers must be a number', () => {
     const invalid = {
       type: 'test',
@@ -52,6 +60,19 @@ describe('BuildingDefinition', () => {
       workers: '2',
       cost: 0,
       terrain: ['plaine'],
+    } satisfies BuildingDefinition
+    expect(invalid.type).toBe('test')
+  })
+
+  it('AC#2 — compile-time check: terrain must be an array', () => {
+    const invalid = {
+      type: 'test',
+      inputs: {},
+      outputs: {},
+      workers: 0,
+      cost: 0,
+      // @ts-expect-error — terrain must be string[], not string
+      terrain: 'plaine',
     } satisfies BuildingDefinition
     expect(invalid.type).toBe('test')
   })
