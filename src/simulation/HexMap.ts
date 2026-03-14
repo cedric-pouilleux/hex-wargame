@@ -10,6 +10,13 @@ export class HexOccupiedError extends Error {
   }
 }
 
+export class InvalidHexCoordError extends Error {
+  constructor(coord: AxialCoord) {
+    super(`Invalid hex coord: ${coord.q},${coord.r}`)
+    this.name = 'InvalidHexCoordError'
+  }
+}
+
 export class HexMap {
   /** Ensemble de tous les hexIds valides de l'île — format "q,r" */
   readonly coords: ReadonlySet<string>
@@ -18,25 +25,34 @@ export class HexMap {
   private readonly claims = new Map<string, string>()
 
   constructor(axialCoords: readonly AxialCoord[]) {
-    this.coords = new Set(axialCoords.map(({ q, r }) => `${q},${r}`))
+    this.coords = new Set(axialCoords.map(HexMap.coordToId))
+  }
+
+  /** Convertit une coordonnée axiale en hexId string "q,r". */
+  static coordToId(coord: AxialCoord): string {
+    return `${coord.q},${coord.r}`
   }
 
   /**
    * Vérifie si la coord appartient à l'île.
-   * Retourne `true` si valide, throw si absent (fail-fast — architecture §Failure Mode Preventions).
+   * Retourne `true` si valide, throw InvalidHexCoordError si absent
+   * (fail-fast — architecture §Failure Mode Preventions).
    */
   isValid(coord: AxialCoord): true {
-    if (!this.coords.has(`${coord.q},${coord.r}`)) {
-      throw new Error(`Invalid hex coord: ${coord.q},${coord.r}`)
+    if (!this.coords.has(HexMap.coordToId(coord))) {
+      throw new InvalidHexCoordError(coord)
     }
     return true
   }
 
   /**
    * Réclame un hex libre pour un bâtiment ou une ville.
-   * Throw HexOccupiedError si le hex est déjà occupé.
+   * Throw si hexId hors-île (invariant island) ou si déjà occupé (HexOccupiedError).
    */
   claimHex(hexId: string, buildingId: string): void {
+    if (!this.coords.has(hexId)) {
+      throw new Error(`Cannot claim hex outside island: ${hexId}`)
+    }
     const existing = this.claims.get(hexId)
     if (existing !== undefined) {
       throw new HexOccupiedError(hexId, existing)

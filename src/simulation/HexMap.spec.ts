@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { HexMap, HexOccupiedError, type AxialCoord } from './HexMap'
+import { HexMap, HexOccupiedError, InvalidHexCoordError, type AxialCoord } from './HexMap'
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -26,12 +26,12 @@ describe('HexMap', () => {
 
   // ── AC#2 ──────────────────────────────────────────────────────────────────
 
-  it('AC#2 — isValid throw pour une coordonnée hors-île', () => {
-    expect(() => map.isValid({ q: 99, r: 99 })).toThrow()
+  it('AC#2 — isValid throw InvalidHexCoordError pour une coordonnée hors-île', () => {
+    expect(() => map.isValid({ q: 99, r: 99 })).toThrow(InvalidHexCoordError)
   })
 
   it('AC#2 — isValid throw pour des coordonnées négatives absentes de l\'île', () => {
-    expect(() => map.isValid({ q: -1, r: 0 })).toThrow()
+    expect(() => map.isValid({ q: -1, r: 0 })).toThrow(InvalidHexCoordError)
   })
 
   // ── AC#3 ──────────────────────────────────────────────────────────────────
@@ -97,6 +97,23 @@ describe('HexMap', () => {
   it('coordonnées négatives valides dans l\'île sont acceptées', () => {
     const mapWithNegative = new HexMap([{ q: -1, r: -1 }, { q: 0, r: 0 }])
     expect(mapWithNegative.isValid({ q: -1, r: -1 })).toBe(true)
-    expect(() => mapWithNegative.isValid({ q: 1, r: 1 })).toThrow()
+    expect(() => mapWithNegative.isValid({ q: 1, r: 1 })).toThrow(InvalidHexCoordError)
+  })
+
+  // ── M1 fix — claimHex valide hexId dans l'île ─────────────────────────────
+
+  it('M1 — claimHex throw si hexId hors-île', () => {
+    expect(() => map.claimHex('99,99', 'farm-test-1')).toThrow()
+  })
+
+  it('M1 — claimHex sur hexId valide de l\'île réussit', () => {
+    expect(() => map.claimHex('0,0', 'farm-test-1')).not.toThrow()
+  })
+
+  // ── L2 — coordToId helper ─────────────────────────────────────────────────
+
+  it('L2 — HexMap.coordToId convertit AxialCoord en string "q,r"', () => {
+    expect(HexMap.coordToId({ q: 3, r: -2 })).toBe('3,-2')
+    expect(HexMap.coordToId({ q: 0, r: 0 })).toBe('0,0')
   })
 })
