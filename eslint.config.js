@@ -25,6 +25,9 @@ export default [
       },
     },
     rules: {
+      // Remplacé par @typescript-eslint/no-unused-vars qui comprend les interfaces TypeScript
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
       'import/no-restricted-paths': ['error', {
         zones: [
           { target: './src/simulation', from: './src/ui' },
