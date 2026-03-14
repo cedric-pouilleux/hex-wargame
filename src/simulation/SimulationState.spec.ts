@@ -4,11 +4,11 @@ import { FluxNetworkStub } from './IFluxNetwork'
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
-function makeBuilding(id: string): Building {
+function makeBuilding(id: string, hexId = 'hex-test-1'): Building {
   return {
     id,
     type: 'ferme',
-    hexId: 'hex-test-1',
+    hexId,
     workers: 0,
     stock: {},
     enabled: true,
@@ -91,6 +91,16 @@ describe('SimulationState.getSnapshot', () => {
 
   beforeEach(() => {
     state = new SimulationState()
+  })
+
+  it('L3 — getSnapshot() sur state vide retourne des arrays vides', () => {
+    const snapshot = state.getSnapshot()
+    expect(snapshot.buildings).toEqual([])
+    expect(snapshot.cities).toEqual([])
+    expect(snapshot.edges).toEqual([])
+    expect(snapshot.buildingOrder).toEqual([])
+    expect(snapshot.currentTick).toBe(0)
+    expect(snapshot.money).toBe(0)
   })
 
   it('AC#3 — snapshot.buildings est un Array (pas un Map)', () => {

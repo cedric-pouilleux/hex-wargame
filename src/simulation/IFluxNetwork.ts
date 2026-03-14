@@ -11,10 +11,12 @@ export class FluxNetworkStub implements IFluxNetwork {
 
   /** Setup test : enregistre un edge pour un bâtiment donné */
   addEdge(buildingId: string, edgeId: string): void {
-    if (!this.edgesByBuilding.has(buildingId)) {
-      this.edgesByBuilding.set(buildingId, new Set())
+    let edges = this.edgesByBuilding.get(buildingId)
+    if (edges === undefined) {
+      edges = new Set()
+      this.edgesByBuilding.set(buildingId, edges)
     }
-    this.edgesByBuilding.get(buildingId)!.add(edgeId)
+    edges.add(edgeId)
   }
 
   removeEdgesFor(buildingId: string): void {

@@ -42,6 +42,11 @@ export class SimulationState {
   currentTick = 0
   money = 0  // pool global Money (FR26)
 
+  /**
+   * Retourne un snapshot readonly du state courant.
+   * Shallow copy : les tableaux sont des copies, mais les objets Building/City/Edge
+   * à l'intérieur sont les mêmes références que dans les Maps — ne pas muter leurs propriétés.
+   */
   getSnapshot(): SimulationSnapshot {
     return {
       buildings: [...this.buildings.values()],
