@@ -1,0 +1,5 @@
+[
+  { "name": "Subsistance", "unit": "rations", "maxStock": 100 },
+  { "name": "Bois",        "unit": "m³",      "maxStock": 200 },
+  { "name": "Charbon",     "unit": "kg",       "maxStock": 150 }
+]
