@@ -3,9 +3,11 @@ import importPlugin from 'eslint-plugin-import'
 
 export default [
   js.configs.recommended,
-  importPlugin.flatConfigs.recommended,
   {
     files: ['src/**/*.ts'],
+    plugins: {
+      import: importPlugin,
+    },
     settings: {
       'import/resolver': {
         typescript: {
