@@ -49,22 +49,28 @@ describe('validateConfig', () => {
     ).toThrow(/moneyRate/)
   })
 
-  it('validates populationGrowthRate > 0', () => {
+  it('validates populationGrowthPeriod > 0', () => {
     expect(() =>
-      validateConfig({ ...DEFAULT_CONFIG, populationGrowthRate: 0 })
-    ).toThrow(/populationGrowthRate/)
+      validateConfig({ ...DEFAULT_CONFIG, populationGrowthPeriod: 0 })
+    ).toThrow(/populationGrowthPeriod/)
   })
 
-  it('validates famineRate > 0', () => {
+  it('validates faminePeriod > 0', () => {
     expect(() =>
-      validateConfig({ ...DEFAULT_CONFIG, famineRate: 0 })
-    ).toThrow(/famineRate/)
+      validateConfig({ ...DEFAULT_CONFIG, faminePeriod: 0 })
+    ).toThrow(/faminePeriod/)
   })
 
   it('validates populationMax > 0', () => {
     expect(() =>
       validateConfig({ ...DEFAULT_CONFIG, populationMax: 0 })
     ).toThrow(/populationMax/)
+  })
+
+  it('L1 — rejects empty version string', () => {
+    expect(() =>
+      validateConfig({ ...DEFAULT_CONFIG, version: '' })
+    ).toThrow(/version/)
   })
 })
 
@@ -88,17 +94,17 @@ describe('DEFAULT_CONFIG', () => {
     expect(DEFAULT_CONFIG.tickRate).toBeGreaterThan(0)
     expect(DEFAULT_CONFIG.routeBoostFactor).toBeGreaterThanOrEqual(1.0)
     expect(DEFAULT_CONFIG.moneyRate).toBeGreaterThan(0)
-    expect(DEFAULT_CONFIG.populationGrowthRate).toBeGreaterThan(0)
-    expect(DEFAULT_CONFIG.famineRate).toBeGreaterThan(0)
+    expect(DEFAULT_CONFIG.populationGrowthPeriod).toBeGreaterThan(0)
+    expect(DEFAULT_CONFIG.faminePeriod).toBeGreaterThan(0)
     expect(DEFAULT_CONFIG.populationMax).toBeGreaterThan(0)
   })
 
-  it('AC#4 — Readonly<GameConfig> forbids mutation at compile-time', () => {
+  it('AC#4 — Readonly<GameConfig> is a compile-time-only constraint (TypeScript enforced)', () => {
     const config: Readonly<GameConfig> = { ...DEFAULT_CONFIG }
-    // @ts-expect-error — Readonly forbids direct mutation (TypeScript compile error)
-    // If @ts-expect-error is NOT needed (no error), the build would fail — proving Readonly works
+    // @ts-expect-error — TypeScript rejects this assignment at compile-time (Readonly<T>)
+    // Note: Readonly is TS-only — the mutation happens at runtime, but DEFAULT_CONFIG is unaffected
+    // because `config` is a spread copy, not a reference to DEFAULT_CONFIG
     config.tickRate = 99
-    // Readonly is TypeScript-only — runtime mutation is possible but DEFAULT_CONFIG is unaffected
-    expect(DEFAULT_CONFIG.tickRate).toBe(1)  // spread copy: DEFAULT_CONFIG never mutated
+    expect(DEFAULT_CONFIG.tickRate).toBe(1)  // DEFAULT_CONFIG is never mutated
   })
 })
