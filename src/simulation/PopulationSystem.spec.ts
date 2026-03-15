@@ -128,6 +128,41 @@ describe('PopulationSystem.tick — famine', () => {
   })
 })
 
+describe('PopulationSystem.tick — plusieurs villes', () => {
+  let state: SimulationState
+  let system: PopulationSystem
+
+  beforeEach(() => {
+    state = new SimulationState()
+    system = new PopulationSystem(state, testConfig)
+  })
+
+  it('M1 — tick traite chaque ville indépendamment (subsistance vs famine)', () => {
+    const city1 = makeCity('city-test-1', 10)
+    const city2 = makeCity('city-test-2', 10)
+    state.cities.set('city-test-1', city1)
+    state.cities.set('city-test-2', city2)
+
+    // city1 reçoit subsistance, city2 ne reçoit pas
+    city1.receivedSubsistance = true
+    // city2.receivedSubsistance reste false
+    system.tick(10)
+
+    expect(city1.population).toBe(11) // croissance
+    expect(city2.population).toBe(8)  // famine
+  })
+
+  it('tick(0) ne déclenche ni croissance ni famine (guard)', () => {
+    const city = makeCity('city-test-1', 10)
+    state.cities.set('city-test-1', city)
+    city.receivedSubsistance = false
+
+    system.tick(0)
+
+    expect(city.population).toBe(10) // aucun effet
+  })
+})
+
 describe('PopulationSystem.tick — civils et reset', () => {
   let state: SimulationState
   let system: PopulationSystem
@@ -240,6 +275,26 @@ describe('PopulationSystem.allocateWorkers', () => {
 
   it('state vide — allocateWorkers ne throw pas', () => {
     expect(() => system.allocateWorkers()).not.toThrow()
+  })
+
+  it('L2 — civils de plusieurs villes sont sommés pour allocateWorkers', () => {
+    const city1 = makeCity('city-test-1', 3, 3)
+    const city2 = makeCity('city-test-2', 2, 2)
+    state.cities.set('city-test-1', city1)
+    state.cities.set('city-test-2', city2)
+
+    for (let i = 0; i < 6; i++) {
+      const b = makeBuilding(`farm-test-${i + 1}`, `${i},0`)
+      state.buildings.set(b.id, b)
+      state.buildingOrder.push(b.id)
+    }
+
+    system.allocateWorkers()
+
+    let total = 0
+    for (const b of state.buildings.values()) total += b.workers
+    expect(total).toBeLessThanOrEqual(5) // 3 + 2 civils
+    expect(total).toBe(5) // 5 bâtiments reçoivent 1 worker, le 6ème reçoit 0
   })
 
   it('0 civils — tous les bâtiments reçoivent 0 worker', () => {

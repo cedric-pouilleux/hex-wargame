@@ -19,6 +19,9 @@ export class PopulationSystem {
    * Ville à 0 jamais supprimée (architecture §Failure Mode Preventions §PopulationSystem).
    */
   tick(currentTick: number): void {
+    // Guard tick=0 : 0 % n === 0 est toujours vrai — TickOrchestrator doit appeler à partir de tick ≥ 1
+    if (currentTick === 0) return
+
     for (const city of this.state.cities.values()) {
       if (currentTick % this.config.populationGrowthPeriod === 0 && city.receivedSubsistance) {
         city.population = Math.min(this.config.populationMax, Math.max(0, city.population + 1))
@@ -46,7 +49,9 @@ export class PopulationSystem {
 
     for (const id of this.state.buildingOrder) {
       const building = this.state.buildings.get(id)
-      if (building === undefined) continue
+      if (building === undefined) {
+        throw new Error(`allocateWorkers: buildingOrder contains unknown id '${id}' — buildingOrder out of sync`)
+      }
       building.workers = Math.min(1, remainingCivils)
       remainingCivils = Math.max(0, remainingCivils - building.workers)
     }
