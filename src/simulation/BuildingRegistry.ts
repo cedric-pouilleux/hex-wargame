@@ -9,6 +9,13 @@ export class BuildingNotFoundError extends Error {
   }
 }
 
+export class WorkerInvariantError extends Error {
+  constructor(total: number, civils: number) {
+    super(`Worker invariant violated: ${total} workers > ${civils} civils`)
+    this.name = 'WorkerInvariantError'
+  }
+}
+
 export class BuildingRegistry {
   private readonly state: SimulationState
   private readonly fluxNetwork: IFluxNetwork
@@ -21,6 +28,9 @@ export class BuildingRegistry {
   }
 
   addBuilding(building: Building): void {
+    if (this.state.buildings.has(building.id)) {
+      throw new Error(`Building already registered: ${building.id}`)
+    }
     this.hexMap.claimHex(building.hexId, building.id)
     this.state.buildings.set(building.id, building)
     this.state.buildingOrder.push(building.id)
@@ -38,9 +48,10 @@ export class BuildingRegistry {
     }
     this.state.buildings.delete(id)
     const idx = this.state.buildingOrder.indexOf(id)
-    if (idx !== -1) {
-      this.state.buildingOrder.splice(idx, 1)
+    if (idx === -1) {
+      throw new Error(`buildingOrder out of sync: ${id} in buildings but not in buildingOrder`)
     }
+    this.state.buildingOrder.splice(idx, 1)
     this.fluxNetwork.removeEdgesFor(id)
     this.hexMap.releaseHex(building.hexId)
   }
@@ -56,7 +67,7 @@ export class BuildingRegistry {
       total += building.workers
     }
     if (total > civils) {
-      throw new Error(`Worker invariant violated: ${total} workers > ${civils} civils`)
+      throw new WorkerInvariantError(total, civils)
     }
   }
 }

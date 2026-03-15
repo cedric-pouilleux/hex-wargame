@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { BuildingRegistry, BuildingNotFoundError } from './BuildingRegistry'
+import { BuildingRegistry, BuildingNotFoundError, WorkerInvariantError } from './BuildingRegistry'
 import { SimulationState, type Building } from './SimulationState'
 import { FluxNetworkStub } from './IFluxNetwork'
 import { HexMap } from './HexMap'
@@ -121,6 +121,11 @@ describe('BuildingRegistry', () => {
     expect(stub.getEdgesFor('mine-test-1')).toHaveLength(1)
   })
 
+  it('M1 — addBuilding throw si l\'id est déjà enregistré', () => {
+    registry.addBuilding(makeBuilding('farm-test-1', '0,0'))
+    expect(() => registry.addBuilding(makeBuilding('farm-test-1', '1,0'))).toThrow('farm-test-1')
+  })
+
   it('buildingOrder préserve l\'ordre après suppression du bâtiment du milieu', () => {
     registry.addBuilding(makeBuilding('farm-test-1', '0,0'))
     registry.addBuilding(makeBuilding('mine-test-1', '1,0'))
@@ -149,10 +154,10 @@ describe('BuildingRegistry.assertWorkersConsistency', () => {
     expect(() => registry.assertWorkersConsistency(5)).not.toThrow()
   })
 
-  it('throw si sum(workers) > civils', () => {
+  it('throw WorkerInvariantError si sum(workers) > civils', () => {
     registry.addBuilding(makeBuilding('farm-test-1', '0,0', 3))
     registry.addBuilding(makeBuilding('mine-test-1', '1,0', 3))
-    expect(() => registry.assertWorkersConsistency(5)).toThrow()
+    expect(() => registry.assertWorkersConsistency(5)).toThrow(WorkerInvariantError)
   })
 
   it('ne throw pas sur state vide (0 workers)', () => {
