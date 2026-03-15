@@ -1,3 +1,5 @@
+import type { HexTile } from './TerrainType'
+
 export interface Building {
   id: string
   type: string                            // références BuildingDefinition.type (ex. "ferme")
@@ -32,6 +34,7 @@ export type SimulationSnapshot = {
   readonly buildingOrder: readonly string[]
   readonly currentTick: number
   readonly money: number
+  readonly hexTiles: readonly HexTile[]
 }
 
 export class SimulationState {
@@ -55,6 +58,7 @@ export class SimulationState {
       buildingOrder: [...this.buildingOrder],
       currentTick: this.currentTick,
       money: this.money,
+      hexTiles: [],   // wiring complet Story 2.3+ via TickOrchestrator
     }
   }
 }

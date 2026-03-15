@@ -6,6 +6,7 @@ export interface GameConfig {
   populationGrowthPeriod: number  // ticks between each +1 population (with Subsistence)
   faminePeriod: number            // ticks between each -2 population (without Subsistence)
   populationMax: number
+  startingMoney: number       // Initial Money pool at game start (before any generation — FR07)
 }
 
 export const DEFAULT_CONFIG: Readonly<GameConfig> = {
@@ -16,6 +17,7 @@ export const DEFAULT_CONFIG: Readonly<GameConfig> = {
   populationGrowthPeriod: 10, // +1 inhabitant every 10 ticks (at 1 tick/s = every 10s) [PRD §FR24]
   faminePeriod: 5,            // -2 inhabitants every 5 ticks (at 1 tick/s = every 5s) [PRD §FR24]
   populationMax: 50,
+  startingMoney: 500,         // POC default — enough to place ~3-5 buildings [FR07]
 }
 
 export function validateConfig(config: GameConfig): void {
@@ -35,6 +37,8 @@ export function validateConfig(config: GameConfig): void {
     violations.push(`faminePeriod must be > 0, got ${config.faminePeriod}`)
   if (config.populationMax <= 0)
     violations.push(`populationMax must be > 0, got ${config.populationMax}`)
+  if (config.startingMoney < 0)
+    violations.push(`startingMoney must be >= 0, got ${config.startingMoney}`)
 
   if (violations.length > 0) {
     throw new Error(`Invalid GameConfig:\n${violations.join('\n')}`)

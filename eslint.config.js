@@ -16,6 +16,7 @@ export default [
         clearTimeout: 'readonly',
         HTMLCanvasElement: 'readonly',
         HTMLElement: 'readonly',
+        DOMRect: 'readonly',
         document: 'readonly',
         window: 'readonly',
       },

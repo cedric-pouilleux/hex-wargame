@@ -5,7 +5,7 @@
     "outputs": { "Subsistance": 5 },
     "workers": 2,
     "cost": 100,
-    "terrain": ["plaine"]
+    "terrain": ["plain"]
   },
   {
     "type": "mine",
@@ -13,7 +13,7 @@
     "outputs": { "Bois": 3, "Charbon": 2 },
     "workers": 3,
     "cost": 150,
-    "terrain": ["foret", "montagne"]
+    "terrain": ["forest", "montagne"]
   },
   {
     "type": "entrepot",
@@ -21,6 +21,6 @@
     "outputs": {},
     "workers": 1,
     "cost": 50,
-    "terrain": ["plaine", "foret", "montagne"]
+    "terrain": ["plain", "forest", "montagne"]
   }
 ]
