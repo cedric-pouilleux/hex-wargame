@@ -9,6 +9,16 @@ export default [
     files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsParser,
+      globals: {
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        HTMLCanvasElement: 'readonly',
+        HTMLElement: 'readonly',
+        document: 'readonly',
+        window: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,

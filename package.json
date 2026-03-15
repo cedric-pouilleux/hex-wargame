@@ -10,6 +10,7 @@
     "test": "vitest",
     "test:sim": "vitest run --project simulation",
     "test:ui": "vitest run --project ui",
+    "test:renderer": "vitest run --project renderer",
     "lint": "eslint src/"
   },
   "dependencies": {
